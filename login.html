@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> GradeUs Login</title>
+    <style>
+     body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    padding: 3.5rem;
+    border-radius: 30px;
+    width: 100%;
+    max-width: 420px;
+    transform: translateY(0);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.7) inset,
+        0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.8),
+        transparent
+    );
+    transform: skewX(-15deg);
+    transition: 1s;
+}
+
+.container:hover {
+    transform: translateY(-8px);
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+        0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.container:hover::before {
+    left: 100%;
+    transition: 1s ease;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    color: #1a237e;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textGradient 8s ease infinite;
+}
+
+@keyframes textGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #ee7752, #e73c7e);
+    border-radius: 4px;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.8rem;
+    color: #455a64;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    transform-origin: left;
+}
+
+input {
+    width: 100%;
+    padding: 1.2rem;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    transition: all 0.4s ease;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 
+        -5px -5px 10px rgba(255, 255, 255, 0.5),
+        5px 5px 10px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    border-color: #23a6d5;
+    box-shadow: 
+        0 0 0 4px rgba(35, 166, 213, 0.1),
+        -5px -5px 10px rgba(255, 255, 255, 0.5),
+        5px 5px 10px rgba(0, 0, 0, 0.05);
+    transform: scale(1.02);
+}
+
+input::placeholder {
+    color: #9e9e9e;
+    font-size: 1rem;
+}
+
+button {
+    width: 100%;
+    padding: 1.2rem;
+    background: linear-gradient(45deg, #ee7752, #e73c7e, #23a6d5);
+    background-size: 200% 200%;
+    color: white;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    animation: gradientButton 8s ease infinite;
+}
+
+@keyframes gradientButton {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+    transform: scale(0);
+    transition: transform 0.6s ease-out;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+button:hover::before {
+    transform: scale(1);
+}
+
+button:active {
+    transform: translateY(1px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.link {
+    text-align: center;
+    margin-top: 2.5rem;
+    position: relative;
+}
+
+.link p {
+    color: #546e7a;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.link a {
+    color: #23a6d5;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 0 4px;
+}
+
+.link a::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #ee7752, #e73c7e);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link a:hover {
+    color: #e73c7e;
+}
+
+.link a:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 2.5rem;
+        margin: 1rem;
+    }
+    
+    h2 {
+        font-size: 2rem;
+    }
+    
+    input, button {
+        padding: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body, h2, button {
+        animation: none;
+    }
+    
+    .container, input, button, .link a::before {
+        transition: none;
+    }
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2> GradeUs Login</h2>
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter your username" required>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+    </div>
+    <button onclick="login()">Login</button>
+
+    <div class="link">
+        <p>Don't have an account? <a href="sign-up.html">Sign Up</a></p>
+    </div>
+</div>
+
+<script>
+    function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        const storedUsername = localStorage.getItem('username');
+        const storedPassword = localStorage.getItem('password');
+
+        if (username === storedUsername && password === storedPassword) {
+            // Redirect to homepage.html after successful login
+            window.location.href = 'attendance.html';
+        } else {
+            alert('Invalid credentials. Please try again.');
+        }
+    }
+</script>
+
+</body>
+</html>

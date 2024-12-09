@@ -1,0 +1,1882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GradeUs - Enhanced Attendance</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Root Variables */
+              /* Core Variables */
+              :root {
+    /* Core Colors */
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-dark: #4338ca;
+    --secondary: #3b82f6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    
+    /* Neutral Colors */
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    
+    /* Toggle Switch */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch input[type="checkbox"] {
+    appearance: none;
+    width: 50px;
+    height: 24px;
+    background-color: var(--border-color);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.toggle-switch input[type="checkbox"]:checked {
+    background-color: var(--primary);
+}
+
+.toggle-switch input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.toggle-switch input[type="checkbox"]:checked::before {
+    transform: translateX(26px);
+}
+
+    /* Layout */
+    --sidebar-width: 280px;
+    --header-height: 70px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+.attendance-panel {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.attendance-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.attendance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 1rem;
+}
+
+.attendance-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attendance-stats {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.attendance-stat {
+    flex: 1;
+    background: var(--bg-primary);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.3s ease;
+}
+
+.attendance-stat:hover {
+    background: var(--primary-light);
+    color: white;
+}
+
+.attendance-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.attendance-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.attendance-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.attendance-item {
+    background: var(--bg-primary);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+}
+
+.attendance-item:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student-details {
+    line-height: 1.2;
+}
+
+.attendance-controls button {
+    background: var(--light);
+    border: 1px solid var(--border-light);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.attendance-controls button:hover {
+    background: var(--primary-light);
+    color: white;
+    border-color: var(--primary);
+}
+
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: var(--light);
+    min-height: 100vh;
+    display: flex;
+    color: var(--text-primary);
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    height: 100vh;
+    position: fixed;
+    padding: 1.5rem;
+    color: white;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(-2px);
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link i {
+    width: 1.5rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateX(5px);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    max-width: calc(100vw - var(--sidebar-width));
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary), var(--primary-light));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: left;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.table-header {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--light);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    width: 300px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.search-bar:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-bar input {
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    background: var(--light);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+tr {
+    transition: background-color 0.3s ease;
+}
+
+tr:hover {
+    background: var(--light);
+}
+
+/* Badges */
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0.25rem;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideUp 0.3s ease;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    display: none;
+    animation: slideIn 0.3s ease;
+    z-index: 1001;
+    box-shadow: var(--shadow-lg);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .logo span, .nav-link span {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 80px;
+        max-width: calc(100vw - 80px);
+    }
+
+    .nav-link {
+        justify-content: center;
+        padding: 1rem;
+    }
+
+    .nav-link i {
+        margin: 0;
+    }
+}
+:root {
+    /* Light Theme Variables */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --card-bg: #ffffff;
+    --sidebar-bg: linear-gradient(135deg, #4f46e5, #4338ca);
+    --shadow: rgba(0, 0, 0, 0.1);
+    
+    /* Common Colors */
+    --primary: #4f46e5;
+    --primary-light: #818cf8;
+    --primary-dark: #4338ca;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+}
+:root {
+    /* Core Colors */
+    --primary: #4f46e5;
+    --primary-gradient: linear-gradient(135deg, #4f46e5, #6366f1);
+    --secondary: #0ea5e9;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    
+    /* Light Theme */
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-light: #e2e8f0;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 25px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* Modern Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background: var(--bg-main);
+    min-height: 100vh;
+    display: flex;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* Enhanced Sidebar */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    position: fixed;
+    background: var(--primary-gradient);
+    padding: 2rem;
+    color: white;
+    z-index: 50;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    transform-style: preserve-3d;
+    transition: transform var(--transition-normal);
+}
+
+.logo:hover {
+    transform: translateY(-5px) rotateX(10deg);
+}
+
+.logo i {
+    font-size: 2rem;
+    color: white;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-radius: 1rem;
+    margin-bottom: 0.75rem;
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+.attendance-panel {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.attendance-panel:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.attendance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.attendance-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.attendance-stats {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.attendance-stat {
+    flex: 1;
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+.attendance-stat:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.attendance-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.attendance-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.attendance-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.attendance-item {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.attendance-item:hover {
+    box-shadow: var(--shadow-md);
+    background: var(--primary-light);
+}
+/* Modal Base */
+.modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal.active .modal-content {
+    transform: scale(1);
+}
+
+/* Form Styles */
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #1F2937;
+    transition: all 0.2s ease;
+}
+
+.form-control:hover {
+    border-color: #D1D5DB;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+/* Select Specific Styles */
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    padding-right: 44px;
+}
+
+/* Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #4F46E5;
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #4338CA;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #F3F4F6;
+    color: #4B5563;
+    border: 1px solid #E5E7EB;
+}
+
+.btn-secondary:hover {
+    background-color: #E5E7EB;
+    transform: translateY(-1px);
+}
+
+/* Form Layout */
+.space-y-4 > * + * {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Close Button */
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    background-color: #F3F4F6;
+    color: #4B5563;
+}
+
+.modal-close:hover {
+    background-color: #E5E7EB;
+    color: #1F2937;
+}
+
+/* Form Footer */
+.form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+/* Input States */
+.form-control:disabled {
+    background-color: #F3F4F6;
+    cursor: not-allowed;
+}
+
+.form-control::placeholder {
+    color: #9CA3AF;
+}
+
+/* Error States */
+.form-control.error {
+    border-color: #EF4444;
+}
+
+.error-message {
+    font-size: 12px;
+    color: #EF4444;
+    margin-top: 4px;
+}
+
+/* Animation */
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.modal.active .modal-content {
+    animation: modalIn 0.3s ease-out forwards;
+}
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.student-details {
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.attendance-controls button {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.attendance-controls button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .attendance-panel {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .attendance-stat {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .attendance-item {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .attendance-controls button {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .attendance-controls button:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: var(--transition-normal);
+}
+
+.nav-link:hover::before {
+    left: 100%;
+}
+
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    transform: translateX(10px);
+}
+
+/* Main Content Area */
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+}
+
+/* Enhanced Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+    transform: scaleX(0);
+    transition: transform var(--transition-normal);
+}
+
+.stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--primary-gradient);
+    color: white;
+    margin-bottom: 1rem;
+    transition: transform var(--transition-normal);
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+/* Enhanced Table */
+.table-container {
+    background: var(--bg-card);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: transform var(--transition-normal);
+}
+
+.table-container:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.table-header {
+    padding: 1.5rem;
+    background: linear-gradient(to right, rgba(79, 70, 229, 0.1), transparent);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    width: 300px;
+    transition: all var(--transition-normal);
+}
+
+.search-bar:focus-within {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    border-color: var(--primary);
+}
+
+
+/* Dark Theme Variables */
+[data-theme="dark"] {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --card-bg: #1e293b;
+    --sidebar-bg: linear-gradient(135deg, #312e81, #1e1b4b);
+    --shadow: rgba(0, 0, 0, 0.3);
+
+    /* Adjust Badge Colors for Dark Mode */
+    --success-bg: #064e3b;
+    --success-text: #6ee7b7;
+    --warning-bg: #78350f;
+    --warning-text: #fcd34d;
+    --danger-bg: #7f1d1d;
+    --danger-text: #fca5a5;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.theme-switch {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.theme-switch:hover {
+    transform: rotate(45deg);
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] {
+    /* Body and Main Content */
+    body {
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    /* Sidebar */
+    .sidebar {
+        background: var(--sidebar-bg);
+    }
+
+    /* Cards */
+    .stat-card {
+        background: var(--card-bg);
+        box-shadow: 0 4px 6px var(--shadow);
+    }
+
+    /* Table */
+    .table-container {
+        background: var(--card-bg);
+    }
+
+    th {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+    }
+
+    td {
+        border-bottom-color: var(--border-color);
+    }
+
+    tr:hover {
+        background: var(--bg-primary);
+    }
+
+    /* Form Elements */
+    .form-control {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-light);
+    }
+
+    /* Modal */
+    .modal-content {
+        background: var(--card-bg);
+    }
+
+    /* Badges */
+    .badge-success {
+        background: var(--success-bg);
+        color: var(--success-text);
+    }
+
+    .badge-warning {
+        background: var(--warning-bg);
+        color: var(--warning-text);
+    }
+
+    .badge-danger {
+        background: var(--danger-bg);
+        color: var(--danger-text);
+    }
+
+    /* Search Bar */
+    .search-bar {
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+    }
+
+    .search-bar input {
+        color: var(--text-primary);
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+    }
+}
+
+/* Animation for Theme Switch */
+.theme-transition {
+    transition: background-color 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-bar {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .table-header {
+        flex-direction: column;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    GradeUs
+                </div>
+            </div>
+            <nav class="mt-6">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-user-check"></i>
+                    Attendance
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    Subjects
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    Analytics
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold">Attendance Management</h1>
+                <div class="space-x-4">
+                    <button class="btn btn-secondary" id="addStudentBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Student
+                    </button>
+                    <button class="btn btn-primary" id="takeAttendanceBtn">
+                        <i class="fas fa-user-check"></i>
+                        Take Attendance
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon bg-blue-100 text-blue-600">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold" id="totalStudents">0</div>
+                            <div class="text-gray-500">Total Students</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon bg-green-100 text-green-600">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold" id="presentCount">0</div>
+                            <div class="text-gray-500">Present Today</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon bg-red-100 text-red-600">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold" id="absentCount">0</div>
+                            <div class="text-gray-500">Absent Today</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="flex items-center gap-4">
+                        <div class="stat-icon bg-purple-100 text-purple-600">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold" id="attendanceRate">0%</div>
+                            <div class="text-gray-500">Attendance Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Section -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="flex flex-wrap gap-4 justify-between items-center">
+                        <div class="flex gap-4 flex-1">
+                            <input type="date" class="form-control w-auto" id="dateFilter">
+                            <select class="form-control w-auto" id="classFilter">
+                                <option value="">All Classes</option>
+                            </select>
+                            <input type="text" class="form-control w-64" placeholder="Search students..." id="searchInput">
+                        </div>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>ID</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Student Modal -->
+    <div class="modal" id="addStudentModal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Add New Student</h2>
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('addStudentModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="addStudentForm" class="space-y-4">
+                <div>
+                    <label class="form-label">Student ID</label>
+                    <input type="text" name="id" class="form-control" required placeholder="Enter student ID">
+                </div>
+                <div>
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" required placeholder="Enter student name">
+                </div>
+                <div>
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required placeholder="Enter student email">
+                </div>
+                <div>
+                    <label class="form-label">Class</label>
+                    <select name="class" class="form-control" required>
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addStudentModal')">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Add Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+   // Constants
+const STORAGE_KEYS = {
+    STUDENTS: 'gradeUs_students',
+    ATTENDANCE: 'gradeUs_attendance',
+    CLASSES: 'gradeUs_classes',
+    THEME: 'gradeUs_theme'
+};
+
+const SAMPLE_CLASSES = ['Class A', 'Class B', 'Class C', 'Class D'];
+
+// Data Initialization
+function initializeData() {
+    // Use object literal for better readability
+    const defaultData = {
+        [STORAGE_KEYS.STUDENTS]: [],
+        [STORAGE_KEYS.ATTENDANCE]: {},
+        [STORAGE_KEYS.CLASSES]: SAMPLE_CLASSES
+    };
+
+    Object.entries(defaultData).forEach(([key, value]) => {
+        if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+    });
+}
+
+// Theme Management
+function toggleTheme() {
+    const root = document.documentElement;
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem(STORAGE_KEYS.THEME, newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function initializeTheme() {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.querySelector('#themeToggle i');
+    if (icon) {
+        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+}
+
+
+// Modal Management
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    
+    modal.classList.add('active');
+    const form = modal.querySelector('form');
+    if (form) form.reset();
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+// Student Management
+async function handleAddStudent(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const studentData = {
+        id: formData.get('id'), // Changed from 'studentId'
+        name: formData.get('name'), // Changed from 'studentName'
+        email: formData.get('email'), // Changed from 'studentEmail'
+        class: formData.get('class') // Changed from 'studentClass'
+    };
+
+    // Validation
+    if (Object.values(studentData).some(value => !value)) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    if (!validateEmail(studentData.email)) {
+        alert('Please enter a valid email address');
+        return;
+    }
+
+    const students = getStudents();
+    
+    if (students.some(student => student.id === studentData.id)) {
+        alert('Student ID already exists!');
+        return;
+    }
+
+    try {
+        students.push(studentData);
+        localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+        
+        closeModal('addStudentModal');
+        e.target.reset();
+        updateStudentTable();
+        updateStats();
+        
+        alert('Student added successfully!');
+    } catch (error) {
+        console.error('Error adding student:', error);
+        alert('Failed to add student. Please try again.');
+    }
+}
+
+// Data Retrieval Functions
+function getStudents() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.STUDENTS)) || [];
+    } catch (error) {
+        console.error('Error getting students:', error);
+        return [];
+    }
+}
+
+function getAttendance() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.ATTENDANCE)) || {};
+    } catch (error) {
+        console.error('Error getting attendance:', error);
+        return {};
+    }
+}
+
+function getClasses() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.CLASSES)) || [];
+    } catch (error) {
+        console.error('Error getting classes:', error);
+        return [];
+    }
+}
+
+// UI Update Functions
+function updateStats() {
+    const students = getStudents();
+    const date = document.getElementById('dateFilter')?.value || '';
+    const attendance = getAttendance()[date] || {};
+    
+    const totalStudents = students.length;
+    const presentCount = Object.values(attendance).filter(status => status === 'present').length;
+    const absentCount = totalStudents - presentCount;
+    const attendanceRate = totalStudents ? ((presentCount / totalStudents) * 100).toFixed(1) : '0.0';
+
+    const stats = {
+        totalStudents,
+        presentCount,
+        absentCount,
+        attendanceRate: `${attendanceRate}%`
+    };
+
+    Object.entries(stats).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    });
+}
+
+function updateStudentTable() {
+    const tableBody = document.getElementById('attendanceTableBody');
+    if (!tableBody) return;
+
+    const students = getStudents();
+    const date = document.getElementById('dateFilter')?.value || '';
+    const attendance = getAttendance()[date] || {};
+    const classFilter = document.getElementById('classFilter')?.value || '';
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+
+    const filteredStudents = students.filter(student => {
+        const matchesClass = !classFilter || student.class === classFilter;
+        const matchesSearch = ['name', 'id', 'email']
+            .some(field => student[field].toLowerCase().includes(searchTerm));
+        return matchesClass && matchesSearch;
+    });
+
+    tableBody.innerHTML = filteredStudents.map(student => {
+        const status = attendance[student.id] || 'absent';
+        return `
+            <tr>
+                <td>${student.name}</td>
+                <td>${student.id}</td>
+                <td>${student.email}</td>
+                <td>${student.class}</td>
+                <td>
+                    <span class="status-badge ${status}">
+                        ${status.charAt(0).toUpperCase() + status.slice(1)}
+                    </span>
+                </td>
+                <td>
+                    <div class="flex gap-2">
+                        <button onclick="toggleAttendance('${student.id}')" class="btn btn-secondary">
+                            Toggle Status
+                        </button>
+                        <button onclick="deleteStudent('${student.id}')" class="btn btn-secondary text-red-600">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function updateClassSelects() {
+    const classes = getClasses();
+    const selects = ['classFilter', 'class'].map(id => document.querySelector(`select[name="${id}"], #${id}`));
+    
+    selects.forEach(select => {
+        if (!select) return;
+        
+        const options = [
+            '<option value="">Select Class</option>',
+            ...classes.map(cls => `<option value="${cls}">${cls}</option>`)
+        ];
+        
+        select.innerHTML = classes.length ? options.join('') : '<option value="">No Classes Available</option>';
+    });
+}
+
+// Attendance Management
+function toggleAttendance(studentId) {
+    const date = document.getElementById('dateFilter')?.value;
+    if (!date || !studentId) return;
+
+    const attendance = getAttendance();
+    if (!attendance[date]) {
+        attendance[date] = {};
+    }
+    
+    attendance[date][studentId] = attendance[date][studentId] === 'present' ? 'absent' : 'present';
+    
+    try {
+        localStorage.setItem(STORAGE_KEYS.ATTENDANCE, JSON.stringify(attendance));
+        updateStats();
+        updateStudentTable();
+    } catch (error) {
+        console.error('Error toggling attendance:', error);
+        alert('Failed to update attendance. Please try again.');
+    }
+}
+
+function deleteStudent(studentId) {
+    if (!studentId || !confirm('Are you sure you want to delete this student?')) return;
+    
+    try {
+        const students = getStudents().filter(student => student.id !== studentId);
+        localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(students));
+        
+        updateStats();
+        updateStudentTable();
+    } catch (error) {
+        console.error('Error deleting student:', error);
+        alert('Failed to delete student. Please try again.');
+    }
+}
+
+// Export Function
+function exportAttendance() {
+    const date = document.getElementById('dateFilter')?.value;
+    if (!date) return;
+
+    const students = getStudents();
+    const attendance = getAttendance()[date] || {};
+
+    const headers = ['Student ID', 'Name', 'Class', 'Status', 'Date'];
+    const csvData = [
+        headers,
+        ...students.map(student => [
+            student.id,
+            student.name,
+            student.class,
+            attendance[student.id] || 'absent',
+            date
+        ])
+    ];
+
+    try {
+        const csvContent = csvData.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `attendance-${date}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error exporting attendance:', error);
+        alert('Failed to export attendance. Please try again.');
+    }
+}
+
+// Utility Functions
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// Initialize Application
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        initializeData();
+        initializeTheme();
+        
+        const today = new Date().toISOString().split('T')[0];
+        const dateFilter = document.getElementById('dateFilter');
+        if (dateFilter) {
+            dateFilter.value = today;
+        }
+        
+        updateClassSelects();
+        updateStats();
+        updateStudentTable();
+
+        // Event Listeners
+        const eventListeners = {
+            'themeToggle': { event: 'click', handler: toggleTheme },
+            'addStudentBtn': { event: 'click', handler: () => openModal('addStudentModal') },
+            'addStudentForm': { event: 'submit', handler: handleAddStudent },
+            'dateFilter': { event: 'change', handler: () => {
+                updateStats();
+                updateStudentTable();
+            }},
+            'classFilter': { event: 'change', handler: updateStudentTable },
+            'searchInput': { event: 'input', handler: debounce(updateStudentTable, 300) },
+            'exportBtn': { event: 'click', handler: exportAttendance }
+        };
+
+        Object.entries(eventListeners).forEach(([id, { event, handler }]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener(event, handler);
+            }
+        });
+
+        // Modal Close on Outside Click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal.id);
+                }
+            });
+        });
+    } catch (error) {
+        console.error('Error initializing application:', error);
+        alert('Failed to initialize application. Please refresh the page.');
+    }
+});
+    </script>
+</body>
+</html>
